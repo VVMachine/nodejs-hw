@@ -1,0 +1,27 @@
+{
+  "name": "01-node-basics",
+  "version": "1.0.0",
+  "description": "first homework",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js",
+    "dev": "nodemon index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/VVMachine/nodejs-hw.git"
+  },
+  "author": "VVMachine",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/VVMachine/nodejs-hw/issues"
+  },
+  "homepage": "https://github.com/VVMachine/nodejs-hw#readme",
+  "devDependencies": {
+    "nodemon": "^2.0.6"
+  },
+  "dependencies": {
+    "yargs": "^16.2.0"
+  }
+}
