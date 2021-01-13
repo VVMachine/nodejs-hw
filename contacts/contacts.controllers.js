@@ -1,4 +1,4 @@
-const DButils = require("../utils/DButils");
+const DButils = require("./contacts.utils");
 
 class ContactsController {
   async getContacts(req, res) {

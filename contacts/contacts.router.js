@@ -1,6 +1,6 @@
 const { Router } = require("express");
-const ContactsController = require("../controllers/controllers");
-const ContactsValidators = require("../utils/validators");
+const ContactsController = require("./contacts.controllers");
+const ContactsValidators = require("./contacts.validators");
 
 const contactsRouter = Router();
 
