@@ -2,7 +2,7 @@ const fs = require("fs");
 const path = require("path");
 const { promises: fsPromises } = fs;
 
-const contactsPath = path.join(__dirname, "/db/contacts.json");
+const contactsPath = path.join(__dirname, "../db/contacts.json");
 
 async function getData(pathToFile) {
   const data = await fsPromises.readFile(pathToFile, "utf-8");
@@ -21,13 +21,13 @@ async function setData(pathToFile, dataToWrite) {
 
 async function listContacts() {
   const data = await getData(contactsPath);
-  console.table(data);
+  return data;
 }
 
 async function getContactById(contactId) {
   const data = await getData(contactsPath);
   const contact = data.find((contact) => contactId === contact.id);
-  console.log(contact);
+  return contact;
 }
 
 async function removeContact(contactId) {
@@ -35,10 +35,12 @@ async function removeContact(contactId) {
   const newArray = data.filter((contact) => contactId !== contact.id);
 
   const newData = await setData(contactsPath, newArray);
-  console.table(newData);
+  return newData;
 }
 
-async function addContact(name, email, phone) {
+async function addContact(contact) {
+  const { name, email, phone } = contact;
+
   const data = await getData(contactsPath);
 
   const maxId = data[data.length - 1].id;
@@ -54,7 +56,29 @@ async function addContact(name, email, phone) {
 
   const newData = await setData(contactsPath, newArray);
 
-  console.table(newData);
+  return newData;
+}
+
+async function patchContact(id, newContactData) {
+  const data = await getData(contactsPath);
+
+  const newDataArray = data.map((contact) => {
+    if (contact.id === id) {
+      return {
+        ...contact,
+        ...newContactData,
+      };
+    }
+
+    return contact;
+  });
+
+  
+  const newData = await setData(contactsPath, newDataArray);
+
+  return newData;
+
+
 }
 
 module.exports = {
@@ -62,4 +86,5 @@ module.exports = {
   getContactById,
   removeContact,
   addContact,
+  patchContact,
 };
