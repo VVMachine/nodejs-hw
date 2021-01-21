@@ -1,64 +1,83 @@
-const DButils = require("./contacts.utils");
+const contactModel = require("./contacts.model");
 
 class ContactsController {
-  async getContacts(req, res) {
-    const contacts = await DButils.listContacts();
+  async createContact(req, res, next) {
+    try {
+      const contact = await contactModel.create(req.body);
 
-    res.status(200).send(contacts);
-  }
-
-  async getContactById(req, res) {
-    const contactId = parseInt(req.params.id);
-    const contact = await DButils.getContactById(contactId);
-
-    if (!contact) {
-      return res.status(404).send({ moessage: "Not found" });
+      return res.status(201).json(contact);
+    } catch (err) {
+      next(err);
     }
-
-    res.status(200).send(contact);
   }
 
-  async addContact(req, res) {
-    const newArray = await DButils.addContact(req.body);
+  async getContacts(req, res, next) {
+    try {
+      const contact = await contactModel.find();
 
-    res.status(201).send(newArray);
+      return res.status(200).json(contact);
+    } catch (err) {
+      next(err);
+    }
   }
 
-  async removeContact(req, res) {
-      const contactId = parseInt(req.params.id);
-      const contact = await DButils.getContactById(contactId);
+  async getContactById(req, res, next) {
+    try {
+      const { id } = req.params;
 
-      if (contact) {
-        DButils.removeContact(contactId)
-        res.status(200).send({message: "contact deleted"})
-        return;
-      }
-      
-      res.status(404).send({ moessage: "Not found" })
-
-  }
-
-
-  async patchContact(req, res) {
-    if (Object.keys(req.body).length === 0) {
-        res.status(400).send({ message: 'missing fields' });
-        return;
-      }
-
-      const contactId = parseInt(req.params.id);
-      const contact = await DButils.getContactById(contactId);
+      const contact = await contactModel.findOne({ _id: id });
 
       if (!contact) {
-        res.status(404).send({ message: 'Contact not found' });
-        return;
+        return res.status(404).send();
       }
 
-      const patchContact = await DButils.patchContact(contactId, req.body)
-
-      res.status(200).send(patchContact)
-
+      return res.status(200).json(contact);
+    } catch (err) {
+      next(err);
+    }
   }
 
+  async removeContact(req, res, next) {
+    try {
+      const { id } = req.params;
+
+      const deletedContact = await contactModel.findByIdAndDelete({ _id: id });
+
+      if (!deletedContact) {
+        return res.status(404).send();
+      }
+
+      return res.status(204).send();
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  async patchContact(req, res, next) {
+    try {
+      const { id } = req.params;
+
+      const updatedContact = await contactModel.findByIdAndUpdate(
+        { _id: id },
+        {
+          $set: req.body,
+        },
+        {
+          new: true,
+        }
+      );
+
+      if (!updatedContact) {
+        return res
+          .status(404)
+          .send({ message: "contact successfully updated" });
+      }
+
+      return res.status(204).send();
+    } catch (err) {
+      next(err);
+    }
+  }
 }
 
 module.exports = new ContactsController();
