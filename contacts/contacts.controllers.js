@@ -13,7 +13,7 @@ class ContactsController {
 
   async getContacts(req, res, next) {
     try {
-      const contact = await contactModel.find();
+      const contact = await contactModel.find({});
 
       return res.status(200).json(contact);
     } catch (err) {
@@ -44,10 +44,10 @@ class ContactsController {
       const deletedContact = await contactModel.findByIdAndDelete({ _id: id });
 
       if (!deletedContact) {
-        return res.status(404).send();
+        return res.status(404).send({ message: "contact not found"});
       }
 
-      return res.status(204).send();
+      return res.status(204).send({ message: "successful deleted"});
     } catch (err) {
       next(err);
     }
@@ -70,10 +70,10 @@ class ContactsController {
       if (!updatedContact) {
         return res
           .status(404)
-          .send({ message: "contact successfully updated" });
+          .send({ message: "contact not found"});
       }
 
-      return res.status(204).send();
+      return res.status(204).send({ message: "contact successfully updated" });
     } catch (err) {
       next(err);
     }

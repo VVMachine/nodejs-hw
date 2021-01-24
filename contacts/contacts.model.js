@@ -10,7 +10,7 @@ const contactsSchema = new Schema({
     validate: (value) => value.includes("@"),
   },
   phone: { type: String, required: true },
-  subscription: { type: String, required: true },
+  subscription: { type: String },
   password: { type: String, required: true, min: 8 },
 });
 

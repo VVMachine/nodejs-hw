@@ -8,8 +8,9 @@ function validateNewContact(req, res, next) {
     name: Joi.string().min(1).required(),
     email: Joi.string().email().required(),
     phone: Joi.string().min(10).required(),
-    subscription: Joi.string().required(),
+    subscription: Joi.string(),
     password: Joi.string().min(8).required(),
+    token: Joi.string(),
   });
 
   const validationResult = newContactValidation.validate(req.body);
@@ -31,6 +32,7 @@ function validatePatchContact(req, res, next) {
     phone: Joi.string().min(10),
     subscription: Joi.string(),
     password: Joi.string().min(8),
+    token: Joi.string(),
   });
 
   const validationResult = newContactValidation.validate(req.body);
@@ -49,7 +51,7 @@ function validateObjectId(req, res, next) {
   const { id } = req.params;
 
   if (!ObjectId.isValid(id)) {
-    return res.status(400).send();
+    return res.status(400).send({ message: "incorrect contact ID"});
   }
 
   next();
