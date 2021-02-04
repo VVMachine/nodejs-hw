@@ -30,6 +30,7 @@ module.exports = class ContactsServer {
   initMiddlwares() {
     this.server.use(express.json());
     this.server.use(cors({ origin: `http://localhost:${process.env.PORT}` }));
+    this.server.use(express.static('./public'))
   }
 
   initRoutes() {

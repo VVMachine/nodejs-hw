@@ -3,6 +3,7 @@ const {
   ConflictError,
   UnauthorizedError,
 } = require("../helpers/error.helpers");
+const avatarBuilder = require("../helpers/avatar.builder");
 
 class AuthController {
   async createUser(req, res, next) {
@@ -16,20 +17,26 @@ class AuthController {
 
       const passHash = await userModel.brcPassHash(password);
 
+      const avatar = await avatarBuilder();
+      const avatarURL = `http://localhost:${process.env.PORT}/images/${avatar}`;
+
       const {
         _id: id,
         email: userEmail,
         subscription,
+        avatarURL: userAvatar,
         token,
       } = await userModel.create({
         email,
         password: passHash,
+        avatarURL,
       });
 
       return res.status(201).send({
         user: {
           email: userEmail,
           subscription,
+          avatarURL: userAvatar,
         },
       });
     } catch (err) {
