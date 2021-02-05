@@ -9,6 +9,7 @@ const { UnauthorizedError } = require("../helpers/error.helpers");
 const userSchema = new Schema({
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
+  avatarURL: { type: String, required: true },
   subscription: {
     type: String,
     enum: ["free", "pro", "premium"],
@@ -22,6 +23,7 @@ userSchema.statics.userByEmail = userByEmail;
 userSchema.methods.checkUser = checkUser;
 userSchema.methods.updateToken = updateToken;
 userSchema.statics.verifyToken = verifyToken;
+userSchema.methods.updateAvatar = updateAvatar;
 
 function brcPassHash(password) {
   return bcrypt.hash(password, 3);
@@ -55,6 +57,16 @@ async function updateToken(token) {
 
 function verifyToken(token) {
   return jwt.verify(token, process.env.JWT_SECRET);
+}
+
+async function updateAvatar(avatar) {
+  return userModel.findByIdAndUpdate(
+    this._id,
+    {
+      avatarURL: `http://localhost:${process.env.PORT}/images/${avatar}`,
+    },
+    { new: true }
+  );
 }
 
 const userModel = mongoose.model("User", userSchema);
