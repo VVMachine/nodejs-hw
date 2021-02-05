@@ -60,9 +60,13 @@ function verifyToken(token) {
 }
 
 async function updateAvatar(avatar) {
-  return userModel.findByIdAndUpdate(this._id, {
-    avatarURL: `http://localhost:${process.env.PORT}/images/${avatar}`,
-  });
+  return userModel.findByIdAndUpdate(
+    this._id,
+    {
+      avatarURL: `http://localhost:${process.env.PORT}/images/${avatar}`,
+    },
+    { new: true }
+  );
 }
 
 const userModel = mongoose.model("User", userSchema);
