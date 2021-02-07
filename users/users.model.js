@@ -5,6 +5,7 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
 const { UnauthorizedError } = require("../helpers/error.helpers");
+const { func } = require("joi");
 
 const userSchema = new Schema({
   email: { type: String, required: true, unique: true },
@@ -16,6 +17,7 @@ const userSchema = new Schema({
     default: "free",
   },
   token: { type: String, default: "" },
+  verificationToken: { type: String },
 });
 
 userSchema.statics.brcPassHash = brcPassHash;
@@ -24,6 +26,9 @@ userSchema.methods.checkUser = checkUser;
 userSchema.methods.updateToken = updateToken;
 userSchema.statics.verifyToken = verifyToken;
 userSchema.methods.updateAvatar = updateAvatar;
+userSchema.methods.createVerificationToken = createVerificationToken;
+userSchema.statics.findByVerificationToken = findByVerificationToken;
+userSchema.methods.removeVerificationToken = removeVerificationToken;
 
 function brcPassHash(password) {
   return bcrypt.hash(password, 3);
@@ -67,6 +72,28 @@ async function updateAvatar(avatar) {
     },
     { new: true }
   );
+}
+
+async function createVerificationToken(verificationToken) {
+  return userModel.findByIdAndUpdate(
+    this._id,
+    {
+      verificationToken,
+    },
+    {
+      new: true,
+    }
+  );
+}
+
+async function findByVerificationToken(verificationToken) {
+  return this.findOne({ verificationToken });
+}
+
+async function removeVerificationToken() {
+  return userModel.findByIdAndUpdate(this._id, {
+    verificationToken: null,
+  });
 }
 
 const userModel = mongoose.model("User", userSchema);
