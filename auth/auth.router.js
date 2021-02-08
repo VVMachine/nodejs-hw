@@ -19,4 +19,6 @@ authRouter.post(
 
 authRouter.post("/logout", autorization, AuthController.logout);
 
+authRouter.get("/verify/:verificationToken", AuthController.verifyEmail);
+
 module.exports = authRouter;

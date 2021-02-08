@@ -4,6 +4,9 @@ const {
   UnauthorizedError,
 } = require("../helpers/error.helpers");
 const avatarBuilder = require("../helpers/avatar.builder");
+const { v4: uuidv4 } = require("uuid");
+const sendEmailVerification = require("../helpers/nodemail.sender");
+const { verify } = require("jsonwebtoken");
 
 class AuthController {
   async createUser(req, res, next) {
@@ -20,23 +23,23 @@ class AuthController {
       const avatar = await avatarBuilder();
       const avatarURL = `http://localhost:${process.env.PORT}/images/${avatar}`;
 
-      const {
-        _id: id,
-        email: userEmail,
-        subscription,
-        avatarURL: userAvatar,
-        token,
-      } = await userModel.create({
+      const user = await userModel.create({
         email,
         password: passHash,
         avatarURL,
       });
 
+      const verificationToken = uuidv4();
+
+      await user.createVerificationToken(verificationToken);
+
+      await sendEmailVerification(user.email, verificationToken);
+
       return res.status(201).send({
         user: {
-          email: userEmail,
-          subscription,
-          avatarURL: userAvatar,
+          email: user.email,
+          subscription: user.subscription,
+          avatarURL: user.avatarURL,
         },
       });
     } catch (err) {
@@ -75,6 +78,24 @@ class AuthController {
       return res.status(204).send({
         message: "Successul unaautorized",
       });
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  async verifyEmail(req, res, next) {
+    try {
+      const { verificationToken } = req.params;
+
+      const user = await userModel.findByVerificationToken(verificationToken);
+
+      if (!user) {
+        return res.send(404).send("User not found!");
+      }
+
+      await user.removeVerificationToken();
+
+      return res.status(200).send("Verified");
     } catch (err) {
       next(err);
     }
